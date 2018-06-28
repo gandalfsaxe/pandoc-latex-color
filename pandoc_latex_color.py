@@ -158,8 +158,11 @@ def x11colors():
         'yellowgreen': '9ACD32'
     }
 
-def latex_code(color):
-    return '\\color{' + color + '} '
+def latex_code_div(color):
+    return '\\leavevmode{\\color{' + color + '} '
+
+def latex_code_span(color):
+    return '\\textcolor{' + color + '}{'
 
 def get_correct_color(color):
     if color in x11colors():
@@ -184,7 +187,10 @@ def color(elem, doc):
 
         # Is there a latex-color attribute?
         if 'latex-color' in elem.attributes:
-            return add_latex(elem, latex_code(get_correct_color(elem.attributes['latex-color'])))
+            if elem.tag == "Span":
+                return add_latex(elem, latex_code_span(get_correct_color(elem.attributes['latex-color'])))
+            else:
+                return add_latex(elem, latex_code_div(get_correct_color(elem.attributes['latex-color'])))
         else:
             # Get the classes
             classes = set(elem.classes)
@@ -224,7 +230,8 @@ def add_definition(defined, definition):
         color = 'black'
 
     # Add a definition
-    defined.append({'classes' : set(classes), 'latex': latex_code(color)})
+    defined.append({'classes' : set(classes), 'latex': latex_code_div(color)})
+    defined.append({'classes' : set(classes), 'latex': latex_code_span(color)})
 
 def finalize(doc):
     # Add header-includes if necessary
